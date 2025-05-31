@@ -94,6 +94,7 @@ estilos = {
     'font_titulo_kr': font_kr or "Malgun Gothic",
     'color_titulo_kr': tuple(int(color_titulo_kr[i:i+2], 16) for i in (1, 3, 5)),
     'bg_titulo': tuple(int(bg_titulo[i:i+2], 16) for i in (1, 3, 5)),
+    'altura_texto': altura_texto,
 
     'font_letra_kr': font_kr or "Malgun Gothic",
     'color_letra_kr': tuple(int(color_letra_kr[i:i+2], 16) for i in (1, 3, 5)),
