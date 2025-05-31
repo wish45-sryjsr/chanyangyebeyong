@@ -22,16 +22,12 @@ def get_font_name_from_ttf(ttf_path):
 # ---
 # 파워포인트 생성 함수 (한국어만)
 # ---
-def crear_ppt(titulos_kr, bloques_dict, secuencia, estilos, imagen_titulo, imagen_letra, resaltados):
+def crear_ppt(titulos_kr, bloques_dict, secuencia, estilos, resaltados):
     prs = Presentation()
     prs.slide_width = Inches(13.33)
     prs.slide_height = Inches(7.5)
 
     for i, titulo in enumerate(titulos_kr):
-        slide = prs.slides.add_slide(prs.slide_layouts[6])
-        slide.background.fill.solid()
-        slide.background.fill.fore_color.rgb = RGBColor(*estilos['bg_titulo'])
-
 
         tb = slide.shapes.add_textbox(Inches(1), Inches(estilos['altura_texto']), Inches(11.33), Inches(3))
         tf = tb.text_frame
@@ -49,9 +45,6 @@ def crear_ppt(titulos_kr, bloques_dict, secuencia, estilos, imagen_titulo, image
         for bloque_id in secuencia[i]:
             lineas = bloques_dict[i].get(bloque_id, [])
             for linea in lineas:
-                slide = prs.slides.add_slide(prs.slide_layouts[6])
-                slide.background.fill.solid()
-                slide.background.fill.fore_color.rgb = RGBColor(*estilos['bg_letra'])
 
                 tb = slide.shapes.add_textbox(Inches(1), Inches(estilos['altura_texto']), Inches(11.33), Inches(3))
                 tf = tb.text_frame
@@ -135,7 +128,7 @@ for i in range(num_canciones):
 if st.button("🎷 PPT 생성"):
     it_path = il_path = None
 
-    ppt = crear_ppt(korean_titles, bloques_por_cancion, secuencias, estilos, it_path, il_path, resaltados)
+    ppt = crear_ppt(korean_titles, bloques_por_cancion, secuencias, estilos, resaltados)
 
     ppt_path = "ppt_generado.pptx"
     ppt.save(ppt_path)
