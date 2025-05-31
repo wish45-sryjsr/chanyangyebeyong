@@ -121,8 +121,9 @@ for i in range(num_canciones):
     num_bloques = st.number_input(f"블록 수 #{i+1}", min_value=1, max_value=10, value=3, key=f"num_bloques_{i}")
     bloques = {}
     for j in range(num_bloques):
-        nombre_bloque = st.text_input(f"블록 이름 #{j+1}", key=f"bloque_nombre_{i}_{j}")
-        contenido = st.text_area(f"{nombre_bloque} 내용 입력", key=f"bloque_contenido_{i}_{j}")
+        nombre_bloque = st.text_input(f"🔠 블록 이름 #{j+1}", key=f"bloque_nombre_{i}_{j}")
+        st.markdown(f"**✏️ {nombre_bloque} 가사**")
+        contenido = st.text_area("", key=f"bloque_contenido_{i}_{j}")
         bloques[nombre_bloque] = contenido.split("\n")
     bloques_por_cancion.append(bloques)
 
