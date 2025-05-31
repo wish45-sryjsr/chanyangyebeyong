@@ -93,8 +93,8 @@ bg_titulo = st.color_picker("[제목] 배경 색상", "#FFFFFF")
 color_letra_kr = st.color_picker("[가사]  한국어 색상", "#FFFFFF")
 bg_letra = st.color_picker("[가사]  배경 색상", "#000000")
 
-size_titulo_kr = st.number_input("[제목] 한국어 글자 크기", value=50)
-size_letra_kr = st.number_input("[가사]  한국어 글자 크기", value=50)
+size_titulo_kr = st.number_input("[제목] 한국어 글자 크기", value=36)
+size_letra_kr = st.number_input("[가사]  한국어 글자 크기", value=36)
 
 estilos = {
     'font_titulo_kr': font_kr or "Malgun Gothic",
