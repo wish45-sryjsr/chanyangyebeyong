@@ -22,14 +22,13 @@ def get_font_name_from_ttf(ttf_path):
 # ---
 # 파워포인트 생성 함수 (한국어만)
 # ---
-def crear_ppt(titulos_kr, letras_kr, estilos, imagen_titulo, imagen_letra):
+def crear_ppt(titulos_kr, bloques_dict, secuencia, estilos, imagen_titulo, imagen_letra):
     prs = Presentation()
     prs.slide_width = Inches(13.33)
     prs.slide_height = Inches(7.5)
 
-    for i in range(len(titulos_kr)):
+    for i, titulo in enumerate(titulos_kr):
         slide = prs.slides.add_slide(prs.slide_layouts[6])
-
         if imagen_titulo:
             slide.shapes.add_picture(imagen_titulo, 0, 0, prs.slide_width, prs.slide_height)
         else:
@@ -43,41 +42,40 @@ def crear_ppt(titulos_kr, letras_kr, estilos, imagen_titulo, imagen_letra):
 
         p1 = tf.paragraphs[0]
         run1 = p1.add_run()
-        run1.text = titulos_kr[i]
+        run1.text = titulo
         run1.font.size = Pt(estilos['tamano_titulo_kr'])
         run1.font.name = estilos['font_titulo_kr']
         run1.font.color.rgb = RGBColor(*estilos['color_titulo_kr'])
         p1.alignment = PP_ALIGN.CENTER
 
-        for j in range(len(letras_kr[i])):
-            k_line = letras_kr[i][j]
+        for bloque_id in secuencia[i]:
+            lineas = bloques_dict[i].get(bloque_id, [])
+            for linea in lineas:
+                slide = prs.slides.add_slide(prs.slide_layouts[6])
+                if imagen_letra:
+                    slide.shapes.add_picture(imagen_letra, 0, 0, prs.slide_width, prs.slide_height)
+                else:
+                    slide.background.fill.solid()
+                    slide.background.fill.fore_color.rgb = RGBColor(*estilos['bg_letra'])
 
-            slide = prs.slides.add_slide(prs.slide_layouts[6])
+                tb = slide.shapes.add_textbox(Inches(1), Inches(estilos['altura_texto']), Inches(11.33), Inches(3))
+                tf = tb.text_frame
+                tf.clear()
+                tf.word_wrap = True
 
-            if imagen_letra:
-                slide.shapes.add_picture(imagen_letra, 0, 0, prs.slide_width, prs.slide_height)
-            else:
-                slide.background.fill.solid()
-                slide.background.fill.fore_color.rgb = RGBColor(*estilos['bg_letra'])
-
-            tb = slide.shapes.add_textbox(Inches(1), Inches(estilos['altura_texto']), Inches(11.33), Inches(3))
-            tf = tb.text_frame
-            tf.clear()
-            tf.word_wrap = True
-
-            p1 = tf.paragraphs[0]
-            run1 = p1.add_run()
-            run1.text = k_line
-            run1.font.size = Pt(estilos['tamano_letra_kr'])
-            run1.font.name = estilos['font_letra_kr']
-            run1.font.color.rgb = RGBColor(*estilos['color_letra_kr'])
-            p1.alignment = PP_ALIGN.CENTER
+                p1 = tf.paragraphs[0]
+                run1 = p1.add_run()
+                run1.text = linea
+                run1.font.size = Pt(estilos['tamano_letra_kr'])
+                run1.font.name = estilos['font_letra_kr']
+                run1.font.color.rgb = RGBColor(*estilos['color_letra_kr'])
+                p1.alignment = PP_ALIGN.CENTER
 
     return prs
 
 # --- Streamlit UI ---
 st.set_page_config(layout="wide")
-st.title("마한장 (한국어 버전)")
+st.title("마한장 (블록 반복 버전)")
 
 num_canciones = st.number_input("찬양 개수", min_value=1, max_value=10, step=1)
 altura_texto = st.slider("글자 위치 (0.0이 제일 높음)", 0.0, 6.0, value=1.0, step=0.1)
@@ -113,12 +111,24 @@ estilos = {
 imagen_titulo_file = st.file_uploader("[제목] 배경 이미지 (선택사항)", type=['jpg', 'png'], key="img_titulo")
 imagen_letra_file = st.file_uploader("[가사]  배경 이미지 (선택사항)", type=['jpg', 'png'], key="img_letra")
 
-korean_titles, korean_lyrics = [], []
+korean_titles, bloques_por_cancion, secuencias = [], [], []
+
 for i in range(num_canciones):
     st.subheader(f"🎵 찬양 {i+1}")
-    korean_titles.append(st.text_input(f"한국어 [제목] #{i+1}", key=f"kr_title_{i}"))
-    kr_lyrics = st.text_area(f"한국어 [가사]  #{i+1} (줄마다 한 슬라이드에용)", key=f"kr_lyrics_{i}")
-    korean_lyrics.append(kr_lyrics.split("\n"))
+    titulo = st.text_input(f"한국어 [제목] #{i+1}", key=f"kr_title_{i}")
+    korean_titles.append(titulo)
+
+    num_bloques = st.number_input(f"블록 수 #{i+1}", min_value=1, max_value=10, value=3, key=f"num_bloques_{i}")
+    bloques = {}
+    for j in range(num_bloques):
+        nombre_bloque = st.text_input(f"블록 이름 #{j+1}", key=f"bloque_nombre_{i}_{j}")
+        contenido = st.text_area(f"{nombre_bloque} 내용 입력", key=f"bloque_contenido_{i}_{j}")
+        bloques[nombre_bloque] = contenido.split("\n")
+    bloques_por_cancion.append(bloques)
+
+    secuencia_str = st.text_input(f"슬라이드 순서 (예: A,A,B,C)", key=f"secuencia_{i}")
+    secuencia = [s.strip() for s in secuencia_str.split(",") if s.strip() in bloques]
+    secuencias.append(secuencia)
 
 if st.button("🎷 PPT 생성"):
     it_path = il_path = None
@@ -129,7 +139,7 @@ if st.button("🎷 PPT 생성"):
         il_path = "img_letra.jpg"
         with open(il_path, "wb") as f: f.write(imagen_letra_file.read())
 
-    ppt = crear_ppt(korean_titles, korean_lyrics, estilos, it_path, il_path)
+    ppt = crear_ppt(korean_titles, bloques_por_cancion, secuencias, estilos, it_path, il_path)
     ppt_path = "ppt_generado.pptx"
     ppt.save(ppt_path)
 
