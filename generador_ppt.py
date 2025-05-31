@@ -29,11 +29,9 @@ def crear_ppt(titulos_kr, bloques_dict, secuencia, estilos, imagen_titulo, image
 
     for i, titulo in enumerate(titulos_kr):
         slide = prs.slides.add_slide(prs.slide_layouts[6])
-        if imagen_titulo:
-            slide.shapes.add_picture(imagen_titulo, 0, 0, prs.slide_width, prs.slide_height)
-        else:
-            slide.background.fill.solid()
-            slide.background.fill.fore_color.rgb = RGBColor(*estilos['bg_titulo'])
+        slide.background.fill.solid()
+        slide.background.fill.fore_color.rgb = RGBColor(*estilos['bg_titulo'])
+
 
         tb = slide.shapes.add_textbox(Inches(1), Inches(estilos['altura_texto']), Inches(11.33), Inches(3))
         tf = tb.text_frame
@@ -52,11 +50,8 @@ def crear_ppt(titulos_kr, bloques_dict, secuencia, estilos, imagen_titulo, image
             lineas = bloques_dict[i].get(bloque_id, [])
             for linea in lineas:
                 slide = prs.slides.add_slide(prs.slide_layouts[6])
-                if imagen_letra:
-                    slide.shapes.add_picture(imagen_letra, 0, 0, prs.slide_width, prs.slide_height)
-                else:
-                    slide.background.fill.solid()
-                    slide.background.fill.fore_color.rgb = RGBColor(*estilos['bg_letra'])
+                slide.background.fill.solid()
+                slide.background.fill.fore_color.rgb = RGBColor(*estilos['bg_letra'])
 
                 tb = slide.shapes.add_textbox(Inches(1), Inches(estilos['altura_texto']), Inches(11.33), Inches(3))
                 tf = tb.text_frame
@@ -115,9 +110,6 @@ estilos = {
     'tamano_letra_kr': size_letra_kr,
 }
 
-imagen_titulo_file = st.file_uploader("[제목] 배경 이미지 (선택사항)", type=['jpg', 'png'], key="img_titulo")
-imagen_letra_file = st.file_uploader("[가사]  배경 이미지 (선택사항)", type=['jpg', 'png'], key="img_letra")
-
 korean_titles, bloques_por_cancion, secuencias, resaltados = [], [], [], []
 
 for i in range(num_canciones):
@@ -142,12 +134,6 @@ for i in range(num_canciones):
 
 if st.button("🎷 PPT 생성"):
     it_path = il_path = None
-    if imagen_titulo_file:
-        it_path = "img_titulo.jpg"
-        with open(it_path, "wb") as f: f.write(imagen_titulo_file.read())
-    if imagen_letra_file:
-        il_path = "img_letra.jpg"
-        with open(il_path, "wb") as f: f.write(imagen_letra_file.read())
 
     ppt = crear_ppt(korean_titles, bloques_por_cancion, secuencias, estilos, it_path, il_path, resaltados)
 
@@ -157,6 +143,6 @@ if st.button("🎷 PPT 생성"):
     with open(ppt_path, "rb") as f:
         st.download_button("📥 PPT 다운로드", f, file_name=ppt_path)
 
-    for p in [it_path, il_path, "font_kr.ttf", ppt_path]:
+    for p in ["font_kr.ttf", ppt_path]:
         if p and os.path.exists(p):
             os.remove(p)
