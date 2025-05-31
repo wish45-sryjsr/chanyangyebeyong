@@ -22,7 +22,7 @@ def get_font_name_from_ttf(ttf_path):
 # ---
 # 파워포인트 생성 함수 (한국어만)
 # ---
-def crear_ppt(titulos_kr, bloques_dict, secuencia, estilos, imagen_titulo, imagen_letra):
+def crear_ppt(titulos_kr, bloques_dict, secuencia, estilos, imagen_titulo, imagen_letra, resaltados):
     prs = Presentation()
     prs.slide_width = Inches(13.33)
     prs.slide_height = Inches(7.5)
@@ -68,10 +68,17 @@ def crear_ppt(titulos_kr, bloques_dict, secuencia, estilos, imagen_titulo, image
                 run1.text = linea
                 run1.font.size = Pt(estilos['tamano_letra_kr'])
                 run1.font.name = estilos['font_letra_kr']
-                run1.font.color.rgb = RGBColor(*estilos['color_letra_kr'])
+
+                # 💡 Aquí se aplica el color especial si es bloque resaltado
+                if bloque_id == resaltados[i] and bloque_id != "":
+                    run1.font.color.rgb = RGBColor(255, 192, 0)  # Dorado #FFC000
+                else:
+                    run1.font.color.rgb = RGBColor(*estilos['color_letra_kr'])
+
                 p1.alignment = PP_ALIGN.CENTER
 
     return prs
+
 
 # --- Streamlit UI ---
 st.set_page_config(layout="wide")
@@ -111,7 +118,7 @@ estilos = {
 imagen_titulo_file = st.file_uploader("[제목] 배경 이미지 (선택사항)", type=['jpg', 'png'], key="img_titulo")
 imagen_letra_file = st.file_uploader("[가사]  배경 이미지 (선택사항)", type=['jpg', 'png'], key="img_letra")
 
-korean_titles, bloques_por_cancion, secuencias = [], [], []
+korean_titles, bloques_por_cancion, secuencias, resaltados = [], [], [], []
 
 for i in range(num_canciones):
     st.subheader(f"🎵 찬양 {i+1}")
@@ -128,6 +135,8 @@ for i in range(num_canciones):
     bloques_por_cancion.append(bloques)
 
     secuencia_str = st.text_input(f"슬라이드 순서 (예: A,A,B,C)", key=f"secuencia_{i}")
+    bloque_resaltado = st.text_input(f"🎨 강조할 블록 이름 (선택사항)", key=f"resaltado_{i}").strip()
+    resaltados.append(bloque_resaltado)
     secuencia = [s.strip() for s in secuencia_str.split(",") if s.strip() in bloques]
     secuencias.append(secuencia)
 
@@ -140,7 +149,8 @@ if st.button("🎷 PPT 생성"):
         il_path = "img_letra.jpg"
         with open(il_path, "wb") as f: f.write(imagen_letra_file.read())
 
-    ppt = crear_ppt(korean_titles, bloques_por_cancion, secuencias, estilos, it_path, il_path)
+    ppt = crear_ppt(korean_titles, bloques_por_cancion, secuencias, estilos, it_path, il_path, resaltados)
+
     ppt_path = "ppt_generado.pptx"
     ppt.save(ppt_path)
 
