@@ -19,7 +19,7 @@ def crear_ppt(titulos_kr, bloques_dict, secuencia, estilos, resaltados):
     for i, titulo in enumerate(titulos_kr):
         slide = prs.slides.add_slide(prs.slide_layouts[6])  # ✅ slide 새로 만듦
         slide.background.fill.solid()
-        slide.background.fill.fore_color.rgb = RGBColor(*estilos['bg_letra'])
+        slide.background.fill.fore_color.rgb = RGBColor(*estilos['bg_titulo'])
         
         tb = slide.shapes.add_textbox(Inches(1), Inches(estilos['altura_texto']), Inches(11.33), Inches(3))
         tf = tb.text_frame
