@@ -30,7 +30,6 @@ def crear_ppt(titulos_kr, bloques_dict, secuencia, estilos, resaltados):
         run1 = p1.add_run()
         run1.text = titulo
         run1.font.size = Pt(estilos['tamano_titulo_kr'])
-        run1.font.name = estilos['font_titulo_kr']
         run1.font.color.rgb = RGBColor(*estilos['color_titulo_kr'])
         p1.alignment = PP_ALIGN.CENTER
 
@@ -50,8 +49,7 @@ def crear_ppt(titulos_kr, bloques_dict, secuencia, estilos, resaltados):
                 run1 = p1.add_run()
                 run1.text = linea
                 run1.font.size = Pt(estilos['tamano_letra_kr'])
-                run1.font.name = estilos['font_letra_kr']
-
+            
                 # 💡 Aquí se aplica el color especial si es bloque resaltado
                 if bloque_id == resaltados[i] and bloque_id != "":
                     run1.font.color.rgb = RGBColor(255, 192, 0)  # Dorado #FFC000
@@ -79,12 +77,10 @@ size_titulo_kr = st.number_input("[제목] 한국어 글자 크기", value=36)
 size_letra_kr = st.number_input("[가사]  한국어 글자 크기", value=36)
 
 estilos = {
-    'font_titulo_kr': font_kr or "Malgun Gothic",
     'color_titulo_kr': tuple(int(color_titulo_kr[i:i+2], 16) for i in (1, 3, 5)),
     'bg_titulo': tuple(int(bg_titulo[i:i+2], 16) for i in (1, 3, 5)),
     'altura_texto': altura_texto,
 
-    'font_letra_kr': font_kr or "Malgun Gothic",
     'color_letra_kr': tuple(int(color_letra_kr[i:i+2], 16) for i in (1, 3, 5)),
     'bg_letra': tuple(int(bg_letra[i:i+2], 16) for i in (1, 3, 5)),
     'altura_texto': altura_texto,
@@ -124,7 +120,6 @@ if st.button("🎷 PPT 생성"):
 
     with open(ppt_path, "rb") as f:
         st.download_button("📥 PPT 다운로드", f, file_name=ppt_path)
-
-    for p in ["font_kr.ttf", ppt_path]:
-        if p and os.path.exists(p):
+        
+    if p and os.path.exists(p):
             os.remove(p)
