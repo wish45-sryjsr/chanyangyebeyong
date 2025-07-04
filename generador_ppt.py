@@ -121,5 +121,5 @@ if st.button("🎷 PPT 생성"):
     with open(ppt_path, "rb") as f:
         st.download_button("📥 PPT 다운로드", f, file_name=ppt_path)
         
-    if p and os.path.exists(p):
-            os.remove(p)
+    if os.path.exists(ppt_path):
+        os.remove(ppt_path)
