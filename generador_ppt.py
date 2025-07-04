@@ -3,21 +3,10 @@ from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
 from pptx.enum.text import PP_ALIGN
-from fontTools.ttLib import TTFont
 import os
 
 # ---
 # 함수: TTF 파일에서 폰트 이름 추출
-# ---
-def get_font_name_from_ttf(ttf_path):
-    font = TTFont(ttf_path)
-    for record in font['name'].names:
-        if record.nameID == 4:
-            try:
-                return record.string.decode('utf-16-be') if b'\x00' in record.string else record.string.decode('utf-8')
-            except:
-                continue
-    return None
 
 # ---
 # 파워포인트 생성 함수 (한국어만)
@@ -80,13 +69,6 @@ st.title("마한장 (블록 반복 버전)")
 
 num_canciones = st.number_input("찬양 개수", min_value=1, max_value=10, step=1)
 altura_texto = st.slider("글자 위치 (0.0이 제일 높음)", 0.0, 6.0, value=1.0, step=0.1)
-
-font_kr_file = st.file_uploader("한국어 글자 폰트 (.ttf)", type=["ttf"], key="fkr")
-font_kr = None
-if font_kr_file:
-    path = "font_kr.ttf"
-    with open(path, "wb") as f: f.write(font_kr_file.read())
-    font_kr = get_font_name_from_ttf(path)
 
 color_titulo_kr = "#000000"
 bg_titulo = "#FFFFFF"
