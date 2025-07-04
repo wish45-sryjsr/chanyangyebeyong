@@ -89,7 +89,7 @@ if font_kr_file:
     font_kr = get_font_name_from_ttf(path)
 
 color_titulo_kr = "#000000"
-bg_titulo = #FFFFFF"
+bg_titulo = "#FFFFFF"
 color_letra_kr = "#FFFFFF"
 bg_letra = "#000000"
 
